@@ -1,0 +1,19 @@
+[package]
+name = "iscc-rs"
+version = "0.1.0"
+authors = ["Alexander Niederbühl <a.niederbuehl@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "iscc_rs"
+
+[dependencies]
+bit-vec = "0.6"
+hex = "0.3"
+image = "0.14"
+itertools = "0.8"
+lazy_static = "1.3"
+sha2 = "0.8"
+unic-ucd-category = "0.9"
+unicode-normalization = "0.1"
+xxhash2 = "0.1"
