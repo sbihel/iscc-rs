@@ -1,3 +1,3 @@
 # iscc-rs
 
-Rust implementation of the [ISCC specification](iscc.codes)
+Rust implementation of the [ISCC specification](https://iscc.codes)
