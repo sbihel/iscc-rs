@@ -54,21 +54,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_meta_id() {
-        // TODO: Also test argument `extra`
-        let (mid1, _, _) = meta_id("ISCC Content Identifiers", "");
-        assert_eq!(mid1, "CCDGhLx6tREif");
-
-        let (mid1, title, extra) = meta_id("Die Unendliche Geschichte", "");
-        assert_eq!(mid1, "CCAZF4K1bBv8i");
-        assert_eq!(title, "die unendliche geschichte");
-        assert_eq!(extra, "");
-
-        let (mid2, _, _) = meta_id(" Die unéndlíche,  Geschichte ", "");
-        assert_eq!(mid1, mid2);
-    }
-
-    #[test]
     fn test_trim_text() {
         let multibyte_2 = "ü".repeat(128);
         let trimmed = text_trim(&multibyte_2);

@@ -154,26 +154,19 @@ impl Iterator for Chunk {
 #[cfg(test)]
 mod tests {
     use super::*;
+
     use std::iter::FromIterator;
+    use std::path::PathBuf;
+
+    /// Returns the path of a given file in the test_data directory.
+    fn get_path(filename: &str) -> String {
+        let testdata_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/test_data/");
+        format!("{}{}", testdata_dir.to_str().unwrap(), filename)
+    }
 
     #[test]
-    fn test_data_id() {
-        assert_eq!(
-            data_id("test_data/cat.jpg").unwrap(),
-            "CDC7Lg4oHA8DC".to_string()
-        );
-        assert_eq!(
-            data_id("test_data/cat.png").unwrap(),
-            "CDCx1AzhDGcT7".to_string()
-        );
-        assert_eq!(
-            data_id("test_data/cat.gif").unwrap(),
-            "CDcLVF7es2AEP".to_string()
-        );
-    }
-    #[test]
     fn test_data_chunks() {
-        let f = File::open("test_data/lenna.jpg").expect("Unable to open file");
+        let f = File::open(get_path("lenna.jpg")).unwrap();
         let chunks1 = Vec::from_iter(data_chunks(f));
         assert_eq!(chunks1.len(), 112);
         assert_eq!(chunks1[0].len(), 38);

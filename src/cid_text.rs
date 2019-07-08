@@ -46,17 +46,3 @@ pub fn content_id_text(text: &str, partial: bool) -> String {
     // 8. Encode and return
     base58::encode(&content_id_digest)
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn test_content_id_text() {
-        let cid_t_np = content_id_text("", false);
-        assert_eq!(cid_t_np, "CT7A4zpmccuEv");
-
-        let cid_t_p = content_id_text("", true);
-        assert_eq!(cid_t_p, "Ct7A4zpmccuEv");
-    }
-
-}

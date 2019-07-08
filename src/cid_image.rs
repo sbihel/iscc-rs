@@ -131,17 +131,3 @@ fn _transform_recursive(vector: &mut [f64], temp: &mut [f64]) {
     vector[len - 2] = temp[halflen - 1];
     vector[len - 1] = temp[len - 1];
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_content_id_image() {
-        let cid_i = content_id_image("test_data/lenna.jpg", false).unwrap();
-        assert_eq!(cid_i, "CYmLoqBRgV32u");
-
-        let cid_i = content_id_image("test_data/lenna.jpg", true).unwrap();
-        assert_eq!(cid_i, "CimLoqBRgV32u");
-    }
-}

@@ -64,30 +64,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_instance_id() {
-        assert_eq!(
-            instance_id("test_data/cat.jpg").unwrap(),
-            (
-                "CRLdd9g4BSUyY".to_string(),
-                "f8e5e94f953709ae8930220da8bada303a370a46157a5cdd50ad2476a7f51e42".to_string()
-            )
-        );
-        assert_eq!(
-            instance_id("test_data/cat.png").unwrap(),
-            (
-                "CR6xpnrJkvQDH".to_string(),
-                "23a5b78a044143b612a0d033384a5ebf95343ec812c3e62caff393852d0328a0".to_string()
-            )
-        );
-        assert_eq!(
-            instance_id("test_data/cat.gif").unwrap(),
-            (
-                "CR167E86HPsZV".to_string(),
-                "424a89d97aa978363b76071510949bf3b3424f3c6d394ccde93d7fa62ced066a".to_string()
-            )
-        );
-    }
-    #[test]
     fn test_top_hash() {
         let input: Vec<Vec<u8>> = vec![vec![1, 2, 3], vec![4, 5, 6], vec![7, 8, 9]];
         let expected: Vec<u8> = vec![
