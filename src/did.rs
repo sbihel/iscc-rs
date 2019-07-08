@@ -47,28 +47,6 @@ pub fn data_id(data_path: &str) -> std::io::Result<String> {
     Ok(encode(&data_id_digest))
 }
 
-struct Chunk {
-    // TODO: Generalize with Reader trait
-    // TODO: Maybe use BufReader
-    data: File,
-    counter: usize,
-    section: Vec<u8>,
-}
-
-impl Chunk {
-    fn new(mut data: File) -> Chunk {
-        let mut buffer = [0; GEAR1_MAX];
-        let n = data.read(&mut buffer).unwrap();
-        let mut section: Vec<u8> = Vec::new();
-        section.extend(&buffer[..n]);
-        Chunk {
-            data,
-            counter: 0,
-            section,
-        }
-    }
-}
-
 pub fn data_chunks(data: File) -> impl Iterator<Item = Vec<u8>> {
     Chunk::new(data)
 }
@@ -102,6 +80,27 @@ pub fn chunk_length(
         }
     }
     i
+}
+struct Chunk {
+    // TODO: Generalize with Reader trait
+    // TODO: Maybe use BufReader
+    data: File,
+    counter: usize,
+    section: Vec<u8>,
+}
+
+impl Chunk {
+    fn new(mut data: File) -> Chunk {
+        let mut buffer = [0; GEAR1_MAX];
+        let n = data.read(&mut buffer).unwrap();
+        let mut section: Vec<u8> = Vec::new();
+        section.extend(&buffer[..n]);
+        Chunk {
+            data,
+            counter: 0,
+            section,
+        }
+    }
 }
 
 impl Iterator for Chunk {
