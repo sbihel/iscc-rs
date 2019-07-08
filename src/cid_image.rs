@@ -7,13 +7,9 @@ const HEAD_CID_I: u8 = 0x12;
 const HEAD_CID_I_PCF: u8 = 0x13;
 
 pub fn content_id_image(img_path: &str, partial: bool) -> ImageResult<String> {
-    // 1. Normalize image to 2-dimensional pixel array
     let pixels = image_normalize(img_path)?;
-
-    // 2. Calculate image hash
     let hash_digest = image_hash(&pixels);
 
-    // 3. Prepend the 1-byte component header
     let mut content_id_digest = if partial {
         vec![HEAD_CID_I_PCF]
     } else {
@@ -21,21 +17,17 @@ pub fn content_id_image(img_path: &str, partial: bool) -> ImageResult<String> {
     };
     content_id_digest.extend(&hash_digest);
 
-    // 4. Encode and return
     Ok(encode(&content_id_digest))
 }
 
 pub fn image_normalize(img_path: &str) -> ImageResult<Vec<Vec<u8>>> {
     let img = image::open(img_path)?;
 
-    // 1. Convert to greyscale
     let img = img.grayscale();
 
-    //  2. Resize to 32x32
     // TODO: Not the same as in pillow, see https://stackoverflow.com/a/23209568
     let img = img.resize_exact(32, 32, FilterType::CatmullRom);
 
-    // 3. Create two dimensional array
     let raw_pixels = img.raw_pixels();
     Ok((0..32)
         .map(|i| (0..32).map(|j| raw_pixels[32 * i + j]).collect())
@@ -43,7 +35,6 @@ pub fn image_normalize(img_path: &str) -> ImageResult<Vec<Vec<u8>>> {
 }
 
 pub fn image_hash(pixels: &[Vec<u8>]) -> Vec<u8> {
-    // 1. DCT per row
     let mut dct_row_lists: Vec<Vec<f64>> = Vec::new();
     for row in pixels.iter() {
         let mut row: Vec<f64> = row.iter().map(|&n| f64::from(n)).collect();
@@ -51,14 +42,13 @@ pub fn image_hash(pixels: &[Vec<u8>]) -> Vec<u8> {
         dct_row_lists.push(row);
     }
 
-    // 2. DCT per col
     let mut dct_col_lists_t: Vec<Vec<f64>> = transpose(&dct_row_lists);
     for mut col in dct_col_lists_t.iter_mut() {
         dct(&mut col);
     }
     let dct_lists: Vec<Vec<f64>> = transpose(&dct_col_lists_t);
 
-    // 3. Extract upper left 8x8 corner
+    // Extract upper left 8x8 corner
     let flat_list: Vec<f64> = dct_lists
         .into_iter()
         .take(8)
@@ -66,10 +56,8 @@ pub fn image_hash(pixels: &[Vec<u8>]) -> Vec<u8> {
         .flatten()
         .collect();
 
-    // 4. Calculate median
     let med = median(&flat_list);
 
-    // 5. Create 64-bit digest by comparing to median
     let bv: BitVec = flat_list.into_iter().map(|v| v > med).collect();
     bv.to_bytes()
 }

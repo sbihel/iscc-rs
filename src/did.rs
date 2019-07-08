@@ -25,25 +25,19 @@ const HEAD_DID: u8 = 0x20;
 pub fn data_id(data_path: &str) -> std::io::Result<String> {
     let data = File::open(data_path)?;
 
-    //  1. & 2. XxHash32 over CDC-Chunks
     let features: Vec<u32> = data_chunks(data)
         .map(|chunk| xxhash2::hash32(&chunk, 0))
         .collect();
 
-    // 3. Apply minimum_hash
     let minhash = minimum_hash(features, 64);
 
-    // 4. Collect least significant bits
     let lsb: BitVec = minhash.iter().map(|x| (x & 1) == 1).collect();
 
-    // 5. Create 64-bit digests
     let lsb_bytes = lsb.to_bytes();
 
-    // 6. Prepend the 1-byte header
     let mut data_id_digest = vec![HEAD_DID];
     data_id_digest.extend(&lsb_bytes);
 
-    // 7. Encode and return
     Ok(encode(&data_id_digest))
 }
 
