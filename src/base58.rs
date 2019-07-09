@@ -41,9 +41,8 @@ pub fn decode(code: &str) -> Vec<u8> {
     let n = code.len();
     if n == 13 {
         return decode(&code[..2])
-            .iter()
-            .chain(decode(&code[2..]).iter())
-            .cloned()
+            .into_iter()
+            .chain(decode(&code[2..]).into_iter())
             .collect();
     }
     assert!(
