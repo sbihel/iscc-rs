@@ -52,15 +52,20 @@ pub fn decode(code: &str) -> Vec<u8> {
         n
     );
     let base: usize = 58;
-    let strlen = code.len();
     let mut num: u64 = 0;
 
     for (i, chr) in code.chars().enumerate() {
-        let power = strlen - (i + 1);
+        let power = n - (i + 1);
         num += (SYMBOLS.iter().position(|c| c == &chr).unwrap() * (base.pow(power as u32))) as u64;
     }
     if n == 2 {
-        assert!(num < 256);
+        assert!(
+            num < 256,
+            "The first two characters encode the 1-byte component header and \
+             have to be < 256. But '{}' is {}.",
+            code,
+            num,
+        );
         let bytes: [u8; 1] = (num as u8).to_be_bytes();
         bytes.to_vec()
     } else {
@@ -91,6 +96,13 @@ mod tests {
         let digest = decode(code);
         let expected_digest: Vec<u8> = vec![0xF7, 0xD6, 0xBD, 0x58, 0x7D, 0x22, 0xA7, 0xCB, 0x6D];
         assert_eq!(digest, expected_digest);
+    }
+    #[test]
+    #[should_panic]
+    fn test_decode_invalid_component_header() {
+        // "1H" is 644, but the component header has to be < 256
+        let code = "1H";
+        decode(code);
     }
 
 }
