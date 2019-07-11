@@ -13,9 +13,11 @@ pub fn meta_id(title: &str, extra: &str) -> (String, String, String) {
     let title_trimmed = text_trim(&title_norm);
     let extra_trimmed = text_trim(&extra_norm);
 
-    let concat = vec![title_trimmed.clone(), extra_trimmed.clone()].join(" ");
+    let concat = format!("{} {}", title_trimmed, extra_trimmed);
+    // trim in case `title` or `extra` is an empty string
+    let concat = concat.trim();
 
-    let n_grams = sliding_window(&concat, WINDOW_SIZE_MID);
+    let n_grams = sliding_window(concat, WINDOW_SIZE_MID);
 
     let hash_digests: Vec<u64> = n_grams
         .iter()

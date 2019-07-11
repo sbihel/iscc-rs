@@ -12,10 +12,10 @@ fn get_path(filename: &str) -> String {
 fn test_meta_id() {
     // TODO: Also test argument `extra`
     let (mid1, _, _) = meta_id("ISCC Content Identifiers", "");
-    assert_eq!(mid1, "CCDGhLx6tREif");
+    assert_eq!(mid1, "CCDFPFc87MhdT");
 
     let (mid1, title, extra) = meta_id("Die Unendliche Geschichte", "");
-    assert_eq!(mid1, "CCAZF4K1bBv8i");
+    assert_eq!(mid1, "CCAKevDpE1eEL");
     assert_eq!(title, "die unendliche geschichte");
     assert_eq!(extra, "");
 
@@ -23,7 +23,7 @@ fn test_meta_id() {
     assert_eq!(mid1, mid2);
 
     let (mid, title, extra) = meta_id("Iñtërnâtiônàlizætiøn☃", "");
-    assert_eq!(mid, "CCdgqVLHSeBDp");
+    assert_eq!(mid, "CCj3TQrYcgaox");
     assert_eq!(title, "internationalizætiøn☃");
     assert_eq!(extra, "")
 }
