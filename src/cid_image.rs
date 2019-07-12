@@ -28,10 +28,12 @@ pub fn image_normalize(img_path: &str) -> ImageResult<Vec<Vec<u8>>> {
     // TODO: Not the same as in pillow, see https://stackoverflow.com/a/23209568
     let img = img.resize_exact(32, 32, FilterType::CatmullRom);
 
-    let raw_pixels = img.raw_pixels();
-    Ok((0..32)
-        .map(|i| (0..32).map(|j| raw_pixels[32 * i + j]).collect())
-        .collect())
+    let two_dim_image = img
+        .raw_pixels()
+        .chunks(32)
+        .map(|row| row.to_vec())
+        .collect();
+    Ok(two_dim_image)
 }
 
 pub fn image_hash(pixels: &[Vec<u8>]) -> Vec<u8> {
