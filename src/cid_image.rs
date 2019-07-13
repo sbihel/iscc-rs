@@ -26,7 +26,7 @@ pub fn image_normalize(img_path: &str) -> ImageResult<Vec<Vec<u8>>> {
     let img = img.grayscale();
 
     // TODO: Not the same as in pillow, see https://stackoverflow.com/a/23209568
-    let img = img.resize_exact(32, 32, FilterType::CatmullRom);
+    let img = img.resize_exact(32, 32, FilterType::Triangle);
 
     let two_dim_image = img
         .raw_pixels()

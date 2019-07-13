@@ -1,6 +1,6 @@
 {
   "content_id_image": {
-    "required": false,
+    "required": true,
     "test_001_pixel_png_transp": {
       "inputs": [
         "pixel_png_transp.png",
