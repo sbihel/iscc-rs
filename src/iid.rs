@@ -1,6 +1,7 @@
 //! Instance-ID
 use std::fs::File;
-use std::io::Read;
+use std::io::BufRead;
+use std::io::BufReader;
 
 use hex;
 use sha2::{Digest, Sha256};
@@ -16,16 +17,18 @@ const HEAD_IID: u8 = 0x30;
 /// those chunks and use the truncated tophash (merkle root) as component body
 /// of the Instance-ID.
 pub fn instance_id(data_path: &str) -> std::io::Result<(String, String)> {
-    let mut data = File::open(data_path)?;
+    let file = File::open(data_path)?;
     let mut leaf_node_digests: Vec<Vec<u8>> = Vec::new();
-    let mut chunk = [0; 64000];
+    let mut reader = BufReader::with_capacity(64000, file);
     loop {
-        let n = data.read(&mut chunk).unwrap();
+        let chunk = reader.fill_buf()?;
+        let n = chunk.len();
         if n == 0 {
             break;
         }
         let zero = &[0];
-        let hash = sha256d(&[zero, &chunk[..n]].concat());
+        let hash = sha256d(&[zero, chunk].concat());
+        reader.consume(n);
         leaf_node_digests.push(hash);
     }
 
