@@ -1,6 +1,8 @@
+#[cfg(test)]
 #[macro_use]
 extern crate doc_comment;
 
+#[cfg(test)]
 doctest!("../README.md");
 
 pub use crate::cid_image::content_id_image;
