@@ -20,7 +20,6 @@ name = "iscc"
 
 [dependencies]
 bit-vec = "0.6"
-criterion = "0.2"
 hex = "0.3"
 image = "0.21"
 itertools = "0.8"
@@ -30,6 +29,7 @@ unicode-normalization = "0.1"
 xxhash2 = "0.1"
 
 [dev-dependencies]
+criterion = "0.2"
 doc-comment = "0.3"
 lipsum = "0.6"
 serde = "1.0"
