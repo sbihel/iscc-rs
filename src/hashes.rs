@@ -1,24 +1,24 @@
 //! Feature Hashing
 use crate::constants::MINHASH_PERMUTATIONS;
 
+const MERSENNE_PRIME: u64 = 2_305_843_009_213_693_951;
+
 /// The `minimum_hash` function takes an arbitrary sized set of 32-bit integer
 /// features and reduces it to a fixed size vector of `n` features such that it
 /// preserves similarity with other sets. It is based on the MinHash
 /// implementation of the [datasketch](https://ekzhu.github.io/datasketch/)
 /// library by [Eric Zhu](https://github.com/ekzhu).
 pub fn minimum_hash(features: Vec<u32>, n: usize) -> Vec<u32> {
-    let mersenne_prime: u64 = (1 << 61) - 1;
-
-    MINHASH_PERMUTATIONS[..n]
-        .iter()
-        .map(|[a, b]| {
-            features
-                .iter()
-                .map(|f| ((a.wrapping_mul((*f).into())).wrapping_add(*b) % mersenne_prime) as u32)
-                .min()
-                .unwrap()
-        })
-        .collect()
+    let mut min_features: Vec<u32> = Vec::new();
+    for [a, b] in MINHASH_PERMUTATIONS[..n].iter() {
+        let min = features
+            .iter()
+            .map(|f| ((a.wrapping_mul((*f).into())).wrapping_add(*b) % MERSENNE_PRIME) as u32)
+            .min()
+            .unwrap();
+        min_features.push(min);
+    }
+    min_features
 }
 
 pub fn sliding_window(seq: &str, width: usize) -> Vec<String> {
