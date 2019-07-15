@@ -4,7 +4,7 @@ use std::io::BufRead;
 use std::io::BufReader;
 
 use hex;
-use sha2::{Digest, Sha256};
+use ring::digest::{digest, SHA256};
 
 use crate::base58;
 
@@ -65,7 +65,9 @@ fn hash_inner_nodes(a: &[u8], b: &[u8]) -> Vec<u8> {
 }
 
 pub fn sha256d(data: &[u8]) -> Vec<u8> {
-    Sha256::digest(&Sha256::digest(data)).to_vec()
+    digest(&SHA256, digest(&SHA256, data).as_ref())
+        .as_ref()
+        .to_vec()
 }
 
 #[cfg(test)]
