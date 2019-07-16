@@ -1,14 +1,14 @@
 //! Instance-ID
 use std::fs::File;
-use std::io::BufRead;
-use std::io::BufReader;
+use std::io::{BufRead, BufReader};
 
 use hex;
 use ring::digest::{digest, SHA256};
 
 use crate::base58;
 
-// Component Headers
+const BUF_SIZE: usize = 20 * 1024 * 1024;
+// Component Header
 const HEAD_IID: u8 = 0x30;
 
 /// The Instance-ID is built from the raw data of the media object to be
@@ -19,17 +19,16 @@ const HEAD_IID: u8 = 0x30;
 pub fn instance_id(data_path: &str) -> std::io::Result<(String, String)> {
     let file = File::open(data_path)?;
     let mut leaf_node_digests: Vec<Vec<u8>> = Vec::new();
-    let mut reader = BufReader::with_capacity(64000, file);
-    loop {
-        let chunk = reader.fill_buf()?;
+    let mut reader = BufReader::with_capacity(BUF_SIZE, file);
+    while let Ok(chunk) = reader.fill_buf() {
         let n = chunk.len();
         if n == 0 {
             break;
         }
         let zero = &[0];
         let hash = sha256d(&[zero, chunk].concat());
-        reader.consume(n);
         leaf_node_digests.push(hash);
+        reader.consume(n);
     }
 
     let top_hash_digest = top_hash(&leaf_node_digests);
