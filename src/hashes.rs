@@ -69,7 +69,7 @@ pub fn similarity_hash(hash_digests: Vec<u64>) -> Vec<u8> {
             shash |= 1 << i
         }
     }
-    shash.to_be_bytes()[8 - n_bytes..].to_vec()
+    shash.to_be_bytes().to_vec()
 }
 
 pub fn xxhash32(data: &[u8]) -> u32 {
