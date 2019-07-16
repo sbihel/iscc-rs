@@ -80,6 +80,9 @@ fn transpose(m: &[Vec<f64>]) -> Vec<Vec<f64>> {
 }
 
 fn median(xs: &[f64]) -> f64 {
+    if xs.is_empty() {
+        panic!("Median can not be computed since the input is empty.")
+    }
     let mut xs = xs.to_owned();
     xs.sort_by(|x, y| x.partial_cmp(y).unwrap());
     let n = xs.len();
@@ -126,4 +129,21 @@ fn _transform_recursive(vector: &mut [f64], temp: &mut [f64]) {
     }
     vector[len - 2] = temp[halflen - 1];
     vector[len - 1] = temp[len - 1];
+}
+
+#[cfg(test)]
+mod tests {
+    use super::median;
+
+    #[test]
+    #[allow(clippy::float_cmp)]
+    fn test_median() {
+        assert_eq!(median(&[1.0, 3.0, 2.0, 2.0]), 2.0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_median_empty_input() {
+        median(&[]);
+    }
 }
