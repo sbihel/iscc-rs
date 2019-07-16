@@ -1,4 +1,8 @@
 //! Feature Hashing
+use std::hash::Hasher;
+
+use twox_hash::{XxHash32, XxHash64};
+
 use crate::constants::MINHASH_PERMUTATIONS;
 
 const MERSENNE_PRIME: u64 = 2_305_843_009_213_693_951;
@@ -66,6 +70,18 @@ pub fn similarity_hash(hash_digests: Vec<u64>) -> Vec<u8> {
         }
     }
     shash.to_be_bytes()[8 - n_bytes..].to_vec()
+}
+
+pub fn xxhash32(data: &[u8]) -> u32 {
+    let mut hasher = XxHash32::with_seed(0);
+    hasher.write(data);
+    hasher.finish() as u32
+}
+
+pub fn xxhash64(data: &[u8]) -> u64 {
+    let mut hasher = XxHash64::with_seed(0);
+    hasher.write(data);
+    hasher.finish()
 }
 
 #[cfg(test)]

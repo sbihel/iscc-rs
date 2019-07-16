@@ -44,8 +44,7 @@ pub fn instance_id(data_path: &str) -> std::io::Result<(String, String)> {
 }
 
 pub fn top_hash(hashes: &[Vec<u8>]) -> Vec<u8> {
-    let size = hashes.len();
-    if size == 1 {
+    if hashes.len() == 1 {
         return hashes[0].clone();
     }
 

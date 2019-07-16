@@ -3,11 +3,10 @@ use std::fs::File;
 use std::io::Read;
 
 use bit_vec::BitVec;
-use xxhash2;
 
 use crate::base58::encode;
 use crate::constants::CHUNKING_GEAR;
-use crate::hashes::minimum_hash;
+use crate::hashes::{minimum_hash, xxhash32};
 
 const GEAR1_NORM: usize = 40;
 const GEAR1_MIN: usize = 20;
@@ -30,7 +29,7 @@ pub fn data_id(data_path: &str) -> std::io::Result<String> {
     let data = File::open(data_path)?;
 
     let features: Vec<u32> = data_chunks(data)
-        .map(|chunk| xxhash2::hash32(&chunk, 0))
+        .map(|chunk| xxhash32(&chunk))
         .collect();
 
     let minhash = minimum_hash(features, 64);

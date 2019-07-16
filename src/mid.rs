@@ -1,6 +1,6 @@
 //! Meta-ID
 use crate::base58::encode;
-use crate::hashes::{similarity_hash, sliding_window};
+use crate::hashes::{similarity_hash, sliding_window, xxhash64};
 use crate::normalization::text_normalize;
 
 const WINDOW_SIZE_MID: usize = 4;
@@ -32,10 +32,7 @@ pub fn meta_id(title: &str, extra: &str) -> (String, String, String) {
 
     let n_grams = sliding_window(concat, WINDOW_SIZE_MID);
 
-    let hash_digests: Vec<u64> = n_grams
-        .iter()
-        .map(|n| xxhash2::hash64(n.as_bytes(), 0))
-        .collect();
+    let hash_digests: Vec<u64> = n_grams.iter().map(|n| xxhash64(n.as_bytes())).collect();
 
     let simhash_digest = similarity_hash(hash_digests);
 

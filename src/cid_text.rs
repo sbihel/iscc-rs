@@ -3,8 +3,7 @@ use bit_vec::BitVec;
 use itertools::Itertools;
 
 use crate::base58;
-use crate::hashes::minimum_hash;
-use crate::hashes::sliding_window;
+use crate::hashes::{minimum_hash, sliding_window, xxhash32};
 use crate::normalization::text_normalize;
 
 const WINDOW_SIZE_CID_T: usize = 13;
@@ -26,10 +25,7 @@ pub fn content_id_text(text: &str, partial: bool) -> String {
         .map(|w| w.chars().intersperse('\u{0020}').collect())
         .collect();
 
-    let features: Vec<u32> = n_grams
-        .iter()
-        .map(|n| xxhash2::hash32(n.as_bytes(), 0))
-        .collect();
+    let features: Vec<u32> = n_grams.iter().map(|n| xxhash32(n.as_bytes())).collect();
 
     let minhash = minimum_hash(features, 64);
 

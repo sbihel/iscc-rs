@@ -24,9 +24,9 @@ hex = "0.3"
 image = "0.21"
 itertools = "0.8"
 ring = "0.15"
+twox-hash = "1.4"
 unic-ucd-category = "0.9"
 unicode-normalization = "0.1"
-xxhash2 = "0.1"
 
 [dev-dependencies]
 criterion = "0.2"
