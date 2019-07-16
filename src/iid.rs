@@ -18,7 +18,7 @@ const HEAD_IID: u8 = 0x30;
 /// of the Instance-ID.
 pub fn instance_id(data_path: &str) -> std::io::Result<(String, String)> {
     let file = File::open(data_path)?;
-    let mut leaf_node_digests: Vec<Vec<u8>> = Vec::new();
+    let mut leaf_node_digests: Vec<[u8; 32]> = Vec::new();
     let mut reader = BufReader::with_capacity(BUF_SIZE, file);
     while let Ok(chunk) = reader.fill_buf() {
         let n = chunk.len();
@@ -42,12 +42,12 @@ pub fn instance_id(data_path: &str) -> std::io::Result<(String, String)> {
     Ok((code, hex_hash))
 }
 
-pub fn top_hash(hashes: &[Vec<u8>]) -> Vec<u8> {
+pub fn top_hash(hashes: &[[u8; 32]]) -> [u8; 32] {
     if hashes.len() == 1 {
-        return hashes[0].clone();
+        return hashes[0];
     }
 
-    let mut pairwise_hashed: Vec<Vec<u8>> = Vec::new();
+    let mut pairwise_hashed: Vec<[u8; 32]> = Vec::new();
     for hash_pair in hashes.chunks(2) {
         let a = &hash_pair[0];
         let b = hash_pair.get(1).unwrap_or(a);
@@ -57,29 +57,15 @@ pub fn top_hash(hashes: &[Vec<u8>]) -> Vec<u8> {
     top_hash(&pairwise_hashed)
 }
 
-fn hash_inner_nodes(a: &[u8], b: &[u8]) -> Vec<u8> {
+fn hash_inner_nodes(a: &[u8], b: &[u8]) -> [u8; 32] {
     let one = &[1];
     sha256d(&[one, a, b].concat())
 }
 
-pub fn sha256d(data: &[u8]) -> Vec<u8> {
-    digest(&SHA256, digest(&SHA256, data).as_ref())
-        .as_ref()
-        .to_vec()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_top_hash() {
-        let input: Vec<Vec<u8>> = vec![vec![1, 2, 3], vec![4, 5, 6], vec![7, 8, 9]];
-        let expected: Vec<u8> = vec![
-            0x21, 0x09, 0x0f, 0x23, 0xeb, 0xe2, 0x2e, 0xfc, 0x65, 0xe3, 0xe7, 0xd8, 0x01, 0x79,
-            0x69, 0xe5, 0xba, 0x31, 0x71, 0xb6, 0x48, 0xd6, 0x1c, 0x36, 0x3a, 0x01, 0x39, 0xc9,
-            0x37, 0x6f, 0x2e, 0xd8,
-        ];
-        assert_eq!(top_hash(&input), expected)
-    }
+pub fn sha256d(data: &[u8]) -> [u8; 32] {
+    let hash1 = digest(&SHA256, data);
+    let hash2 = digest(&SHA256, hash1.as_ref());
+    let mut arr: [u8; 32] = Default::default();
+    arr.copy_from_slice(hash2.as_ref());
+    arr
 }
