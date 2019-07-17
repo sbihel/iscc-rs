@@ -1,6 +1,7 @@
 //! Feature Hashing
 use std::hash::Hasher;
 
+use bit_vec::BitVec;
 use twox_hash::{XxHash32, XxHash64};
 
 use crate::constants::MINHASH_PERMUTATIONS;
@@ -52,24 +53,22 @@ pub fn sliding_window(seq: &str, width: usize) -> Vec<String> {
 pub fn similarity_hash(hash_digests: Vec<u64>) -> Vec<u8> {
     assert!(!hash_digests.is_empty());
     let n_digests = hash_digests.len();
-    let n_bytes = 8;
-    let n_bits = n_bytes * 8;
 
-    let mut vector: Vec<usize> = vec![0; n_bits];
-    for mut digest in hash_digests {
-        for v in vector.iter_mut() {
-            *v += (digest & 1) as usize;
-            digest >>= 1;
+    let mut bitcounts: Vec<u64> = vec![0; 64];
+    for digest in hash_digests {
+        #[allow(clippy::needless_range_loop)]
+        for i in 0..64 {
+            let bit_i = (digest >> i) & 1;
+            bitcounts[i] += bit_i;
         }
     }
-    let minfeatures = n_digests / 2 + n_digests % 2;
-    let mut shash: u64 = 0;
-    for (i, bitcount) in vector.into_iter().enumerate() {
-        if bitcount >= minfeatures {
-            shash |= 1 << i
-        }
-    }
-    shash.to_be_bytes().to_vec()
+    let minfeatures = (n_digests / 2 + n_digests % 2) as u64;
+    let shash: BitVec<u64> = bitcounts
+        .into_iter()
+        .rev()
+        .map(|bitcount| bitcount >= minfeatures)
+        .collect();
+    shash.to_bytes().to_vec()
 }
 
 pub fn xxhash32(data: &[u8]) -> u32 {

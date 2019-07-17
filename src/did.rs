@@ -28,9 +28,7 @@ const HEAD_DID: u8 = 0x20;
 pub fn data_id(data_path: &str) -> std::io::Result<String> {
     let data = File::open(data_path)?;
 
-    let features: Vec<u32> = data_chunks(data)
-        .map(|chunk| xxhash32(&chunk))
-        .collect();
+    let features: Vec<u32> = data_chunks(data).map(|chunk| xxhash32(&chunk)).collect();
 
     let minhash = minimum_hash(features, 64);
 
