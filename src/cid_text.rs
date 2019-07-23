@@ -27,7 +27,7 @@ pub fn content_id_text(text: &str, partial: bool) -> String {
 
     let features: Vec<u32> = n_grams.iter().map(|n| xxhash32(n.as_bytes())).collect();
 
-    let minhash = minimum_hash(features, 64);
+    let minhash = minimum_hash(features);
 
     let lsb: BitVec = minhash.iter().map(|x| (x & 1) == 1).collect();
     let lsb_bytes = lsb.to_bytes();

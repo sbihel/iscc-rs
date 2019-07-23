@@ -9,13 +9,13 @@ use crate::constants::MINHASH_PERMUTATIONS;
 const MERSENNE_PRIME: u64 = 2_305_843_009_213_693_951;
 
 /// The `minimum_hash` function takes an arbitrary sized set of 32-bit integer
-/// features and reduces it to a fixed size vector of `n` features such that it
+/// features and reduces it to a fixed size vector of 64 features such that it
 /// preserves similarity with other sets. It is based on the MinHash
 /// implementation of the [datasketch](https://ekzhu.github.io/datasketch/)
 /// library by [Eric Zhu](https://github.com/ekzhu).
-pub fn minimum_hash(features: Vec<u32>, n: usize) -> Vec<u32> {
+pub fn minimum_hash(features: Vec<u32>) -> Vec<u32> {
     let mut min_features: Vec<u32> = Vec::new();
-    for [a, b] in MINHASH_PERMUTATIONS[..n].iter() {
+    for [a, b] in MINHASH_PERMUTATIONS.iter() {
         let min = features
             .iter()
             .map(|f| ((a.wrapping_mul((*f).into())).wrapping_add(*b) % MERSENNE_PRIME) as u32)
@@ -105,7 +105,7 @@ mod tests {
             1069371393,
         ];
 
-        assert_eq!(minimum_hash(features, 64), outputs);
+        assert_eq!(minimum_hash(features), outputs);
     }
     #[test]
     fn test_sliding_window() {

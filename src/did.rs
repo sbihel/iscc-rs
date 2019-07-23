@@ -30,7 +30,7 @@ pub fn data_id(data_path: &str) -> std::io::Result<String> {
 
     let features: Vec<u32> = data_chunks(data).map(|chunk| xxhash32(&chunk)).collect();
 
-    let minhash = minimum_hash(features, 64);
+    let minhash = minimum_hash(features);
 
     let lsb: BitVec = minhash.iter().map(|x| (x & 1) == 1).collect();
 
