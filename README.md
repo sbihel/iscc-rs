@@ -17,11 +17,10 @@ iscc-rs = "0.1"
 This example shows how to create an ISCC Code.
 ```rust
 use std::error::Error;
-use std::process;
 
 use iscc::{content_id_text, data_id, instance_id, meta_id};
 
-fn example() -> Result<(), Box<dyn Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     // Generate ISCC Component Codes
     let (mid, _title, _extra) = meta_id("Title of Content", "");
     let cid = content_id_text("some text", false);
@@ -33,12 +32,5 @@ fn example() -> Result<(), Box<dyn Error>> {
     println!("ISCC: {}", iscc_code);
 
     Ok(())
-}
-
-fn main() {
-    if let Err(err) = example() {
-        println!("Error running example: {}", err);
-        process::exit(1);
-    }
 }
 ```
