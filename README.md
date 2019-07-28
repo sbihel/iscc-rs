@@ -10,7 +10,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-iscc-rs = "0.1"
+iscc-rs = "0.2"
 ```
 
 ### Example
