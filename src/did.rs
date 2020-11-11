@@ -26,9 +26,13 @@ const HEAD_DID: u8 = 0x20;
 /// chunking algorithm that provides some shift resistance and calculate the
 /// MinHash from those chunks.
 pub fn data_id(data_path: &str) -> std::io::Result<String> {
-    let data = File::open(data_path)?;
+    let mut data = File::open(data_path)?;
 
-    let features: Vec<u32> = data_chunks(data).map(|chunk| xxhash32(&chunk)).collect();
+    Ok(data_id_reader(&mut data))
+}
+
+pub fn data_id_reader(reader: &mut dyn Read) -> String {
+    let features: Vec<u32> = Chunk::new(reader).map(|chunk| xxhash32(&chunk)).collect();
 
     let minhash = minimum_hash(features);
 
@@ -39,11 +43,7 @@ pub fn data_id(data_path: &str) -> std::io::Result<String> {
     let mut data_id_digest = vec![HEAD_DID];
     data_id_digest.extend(&lsb_bytes);
 
-    Ok(encode(&data_id_digest))
-}
-
-pub fn data_chunks(data: File) -> impl Iterator<Item = Vec<u8>> {
-    Chunk::new(data)
+    encode(&data_id_digest)
 }
 
 pub fn chunk_length(
@@ -76,16 +76,14 @@ pub fn chunk_length(
     }
     i
 }
-struct Chunk {
-    // TODO: Generalize with Reader trait
-    // TODO: Maybe use BufReader
-    data: File,
+struct Chunk<'a> {
+    data: &'a mut dyn Read,
     counter: usize,
     section: Vec<u8>,
 }
 
-impl Chunk {
-    fn new(mut data: File) -> Chunk {
+impl Chunk<'_> {
+    fn new(data: &mut dyn Read) -> Chunk {
         let mut buffer = [0; GEAR1_MAX];
         let n = data.read(&mut buffer).unwrap();
         let mut section: Vec<u8> = Vec::new();
@@ -98,7 +96,7 @@ impl Chunk {
     }
 }
 
-impl Iterator for Chunk {
+impl Iterator for Chunk<'_> {
     type Item = Vec<u8>;
     fn next(&mut self) -> Option<Vec<u8>> {
         let mut buffer = [0; GEAR2_MAX];
@@ -106,7 +104,7 @@ impl Iterator for Chunk {
 
         let counter = self.counter;
         let mut section = self.section.clone();
-        let mut data = &self.data;
+        let data = &mut self.data;
         if counter < 100 {
             if section.len() < GEAR1_MAX {
                 let n = data.read(&mut buffer).unwrap();
@@ -154,8 +152,8 @@ mod tests {
 
     #[test]
     fn test_data_chunks() {
-        let f = File::open("tests/test_data/lenna.jpg").unwrap();
-        let chunks1 = Vec::from_iter(data_chunks(f));
+        let mut f = File::open("tests/test_data/lenna.jpg").unwrap();
+        let chunks1 = Vec::from_iter(Chunk::new(&mut f));
         assert_eq!(chunks1.len(), 112);
         assert_eq!(chunks1[0].len(), 38);
         assert_eq!(chunks1.last().unwrap().len(), 2840);

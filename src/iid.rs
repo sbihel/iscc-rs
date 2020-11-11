@@ -19,8 +19,12 @@ const HEAD_IID: u8 = 0x30;
 /// of the Instance-ID.
 pub fn instance_id(data_path: &str) -> std::io::Result<(String, String)> {
     let file = File::open(data_path)?;
-    let mut leaf_node_digests: Vec<[u8; 32]> = Vec::new();
     let mut reader = BufReader::with_capacity(BUF_SIZE, file);
+    Ok(instance_id_reader(&mut reader))
+}
+
+pub fn instance_id_reader(reader: &mut dyn BufRead) -> (String, String) {
+    let mut leaf_node_digests: Vec<[u8; 32]> = Vec::new();
     while let Ok(chunk) = reader.fill_buf() {
         let n = chunk.len();
         if n == 0 {
@@ -40,7 +44,7 @@ pub fn instance_id(data_path: &str) -> std::io::Result<(String, String)> {
     let code = base58::encode(&instance_id_digest);
     let hex_hash = hex::encode(top_hash_digest);
 
-    Ok((code, hex_hash))
+    (code, hex_hash)
 }
 
 pub fn top_hash(hashes: &[[u8; 32]]) -> [u8; 32] {
