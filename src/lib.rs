@@ -7,7 +7,9 @@ pub use crate::cid_image::content_id_image;
 pub use crate::cid_mixed::content_id_mixed;
 pub use crate::cid_text::content_id_text;
 pub use crate::did::data_id;
+pub use crate::did::data_id_reader;
 pub use crate::iid::instance_id;
+pub use crate::iid::instance_id_reader;
 pub use crate::mid::meta_id;
 
 pub mod base58;
